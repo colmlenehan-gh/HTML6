@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" data-html-version="6">
+<head>
+<meta charset="utf-8">
+<title>HTML6 tests</title>
+<script src="../runtime/html6.js" defer></script>
+</head>
+<body>
+<h1>HTML6 self-tests</h1>
+<pre id="results">Running…</pre>
+<state name="test" value="closed"></state>
+<div id="conditional" when="test == 'open'">conditional</div>
+<script>
+window.addEventListener("html6:ready", () => {
+  const out = document.getElementById("results");
+  const checks = [];
+
+  checks.push(["runtime ready", HTML6.ready === true]);
+  checks.push(["version", HTML6.version === "0.1.0"]);
+  checks.push(["state initialized", HTML6.states.get("test") === "closed"]);
+
+  document.querySelector('state[name="test"]').setAttribute("value", "open");
+  document.querySelector('[action="toggle"][target="test"]')?.click();
+  checks.push(["custom element parsing", document.querySelector("state[name=test]") !== null]);
+  checks.push(["semantic element", document.createElement("navigation").localName === "navigation"]);
+
+  const passed = checks.filter(x => x[1]).length;
+  out.textContent = checks.map(x => `${x[1] ? "PASS" : "FAIL"}  ${x[0]}`).join("\n")
+    + `\n\n${passed}/${checks.length} checks passed.`;
+});
+</script>
+</body>
+</html>
