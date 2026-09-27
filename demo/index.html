@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" data-html-version="6">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTML6 Reference Demo</title>
+  <link rel="stylesheet" href="../runtime/html6.css">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; line-height: 1.5; }
+    navigation { display: flex; gap: 12px; margin-bottom: 24px; }
+    .card { border: 1px solid #bbb; padding: 20px; border-radius: 10px; }
+    button, input { font: inherit; padding: 8px 10px; }
+    notice { padding: 10px; background: #eee; }
+  </style>
+  <script src="../runtime/html6.js" defer></script>
+</head>
+<body>
+  <application>
+    <header>
+      <h1>HTML6 Reference Demo</h1>
+      <button action="toggle" target="menu" aria-controls="main-menu" aria-expanded="false">Menu</button>
+      <state name="menu" value="closed"></state>
+      <navigation id="main-menu" when="menu == 'open'">
+        <a href="#home">Home</a>
+        <a href="#settings">Settings</a>
+      </navigation>
+    </header>
+
+    <main id="content">
+      <article class="card">
+        <h2>Declarative state</h2>
+        <p>The menu above is controlled without application JavaScript.</p>
+      </article>
+
+      <article class="card">
+        <h2>Pending forms</h2>
+        <form>
+          <field-group name="account">
+            <label>
+              Email
+              <input type="email" name="email" required autocomplete="email">
+            </label>
+          </field-group>
+          <br>
+          <button type="submit" pending-text="Submitting…">Submit</button>
+        </form>
+      </article>
+
+      <article class="card">
+        <h2>Conditionals</h2>
+        <state name="status" value="open"></state>
+        <button action="toggle" target="status">Toggle status</button>
+        <output-region when="status == 'open'">
+          This region is visible because status is open.
+        </output-region>
+      </article>
+    </main>
+  </application>
+</body>
+</html>
