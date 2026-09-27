@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en" data-html-version="6">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML6 — Proposal &amp; Reference Implementation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12181f;
+  --paper:#eef1ea;
+  --paper-dim:#c9d0c4;
+  --line:#33404c;
+  --accent:#e8a33d;
+  --accent-dim:#8a5c1f;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:"IBM Plex Sans",sans-serif;
+  line-height:1.6;
+  font-size:16px;
+}
+::selection{background:var(--accent);color:var(--ink)}
+h1,h2,h3{font-family:"Fraunces",serif;font-weight:500;letter-spacing:-.01em;margin:0}
+code,pre,.mono{font-family:"IBM Plex Mono",monospace}
+a{color:var(--accent)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+
+header.top{border-bottom:1px solid var(--line);padding:18px 0;position:sticky;top:0;background:rgba(18,24,31,.92);backdrop-filter:blur(6px);z-index:10}
+header.top .wrap{display:flex;justify-content:space-between;align-items:baseline}
+.brand{font-family:"Fraunces",serif;font-size:1.15rem}
+.brand em{font-style:normal;color:var(--accent)}
+.top-nav a{color:var(--paper-dim);text-decoration:none;margin-left:22px;font-size:.9rem;font-family:"IBM Plex Mono",monospace}
+.top-nav a:hover{color:var(--accent)}
+
+.hero{padding:90px 0 70px;border-bottom:1px solid var(--line)}
+.hero .tag{font-family:"IBM Plex Mono",monospace;color:var(--accent);font-size:.85rem}
+.hero h1{font-size:clamp(2.4rem,5vw,3.6rem);max-width:14ch;margin-top:14px}
+.hero p.lede{max-width:56ch;color:var(--paper-dim);font-size:1.1rem;margin-top:18px}
+.hero .status-row{display:flex;gap:26px;margin-top:34px;flex-wrap:wrap}
+.status-row div{font-family:"IBM Plex Mono",monospace;font-size:.82rem;color:var(--paper-dim)}
+.status-row div b{display:block;color:var(--paper);font-size:1.3rem;font-weight:500}
+
+main{padding:60px 0 100px}
+.layout{display:grid;grid-template-columns:200px 1fr;gap:50px}
+@media (max-width:800px){.layout{grid-template-columns:1fr}.side{display:none}}
+.side{position:sticky;top:80px;align-self:start;font-family:"IBM Plex Mono",monospace;font-size:.82rem}
+.side a{display:block;color:var(--paper-dim);text-decoration:none;padding:6px 0;border-left:2px solid transparent;padding-left:12px}
+.side a:hover,.side a.active{color:var(--accent);border-left-color:var(--accent)}
+
+section.doc{margin-bottom:80px;max-width:720px}
+section.doc .num{font-family:"IBM Plex Mono",monospace;color:var(--accent-dim);font-size:.85rem}
+section.doc h2{font-size:1.9rem;margin-top:6px;margin-bottom:16px}
+section.doc p{color:#dfe3da}
+section.doc p.dim{color:var(--paper-dim)}
+
+.def{border-left:3px solid var(--accent);background:#182029;padding:16px 20px;margin:20px 0;font-size:.95rem;color:var(--paper-dim)}
+.def b{color:var(--paper);font-family:"IBM Plex Mono",monospace}
+
+pre.code{background:#0c1116;border:1px solid var(--line);border-radius:3px;padding:16px 18px;overflow-x:auto;font-size:.85rem;color:#c9d6c0;margin:18px 0}
+pre.code .tag{color:var(--accent)}
+pre.code .attr{color:#7fb0d1}
+pre.code .str{color:#c9955a}
+
+.demo{border:1px solid var(--line);border-radius:3px;margin:22px 0;overflow:hidden}
+.demo-label{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.03em;color:var(--ink);background:var(--accent);padding:6px 14px;display:inline-block}
+.demo-body{padding:26px;background:#161c24}
+
+/* --- demo widget styling (styled to look like plain enhanced HTML) --- */
+.demo-body button{
+  font-family:"IBM Plex Mono",monospace;background:transparent;border:1px solid var(--accent);
+  color:var(--accent);padding:8px 16px;border-radius:2px;cursor:pointer;font-size:.85rem;
+}
+.demo-body button:hover{background:var(--accent);color:var(--ink)}
+.demo-body button:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.demo-body [when]{display:none}
+.demo-body [when].h6-active{display:block;margin-top:14px;padding:12px 14px;background:#0c1116;border-left:2px solid var(--accent);color:var(--paper-dim);font-size:.9rem}
+.demo-body .counter-val{font-family:"IBM Plex Mono",monospace;font-size:1.4rem;color:var(--paper);margin-right:16px}
+.demo-body form{display:flex;flex-direction:column;gap:10px;max-width:340px}
+.demo-body input{background:#0c1116;border:1px solid var(--line);color:var(--paper);padding:8px 10px;font-family:"IBM Plex Sans",sans-serif;border-radius:2px}
+.demo-body .err{color:#e0705a;font-size:.8rem;display:none}
+.demo-body .err.h6-show{display:block}
+.demo-body button[disabled]{opacity:.5;cursor:not-allowed}
+article.user-card{border:1px solid var(--line);padding:14px 16px;max-width:300px;border-radius:2px;color:var(--paper-dim)}
+
+table.ref{width:100%;border-collapse:collapse;margin:18px 0;font-size:.88rem}
+table.ref th,table.ref td{text-align:left;border-bottom:1px solid var(--line);padding:8px 10px}
+table.ref th{color:var(--accent);font-family:"IBM Plex Mono",monospace;font-weight:500}
+table.ref td.mono{font-family:"IBM Plex Mono",monospace;color:var(--paper)}
+
+footer{border-top:1px solid var(--line);padding:34px 0;color:var(--paper-dim);font-size:.85rem}
+footer a{color:var(--paper-dim)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">HTML<em>6</em></div>
+    <nav class="top-nav">
+      <a href="#state">State</a>
+      <a href="#forms">Forms</a>
+      <a href="#nav">Navigation</a>
+      <a href="#components">Components</a>
+      <a href="https://github.com/colmlenehan-gh/HTML6">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="tag">PROPOSAL · VERSION 0.1.0 · EXPERIMENTAL</div>
+    <h1>A declarative extension layer for application-grade HTML.</h1>
+    <p class="lede">HTML6 explores how far markup alone can carry state, interaction, forms, and navigation, before you need to reach for JavaScript — while staying backward compatible with every browser shipping today.</p>
+    <div class="status-row">
+      <div><b>Not a standard</b>Independent proposal, unaffiliated with W3C/WHATWG</div>
+      <div><b>~2 files</b>Reference runtime: html6.js + html6.css</div>
+      <div><b>MIT</b>Licensed, © 2026 Colm Lenehan</div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+<div class="layout">
+
+<nav class="side">
+  <a href="#what">01 What it is</a>
+  <a href="#state">02 State &amp; actions</a>
+  <a href="#forms">03 Forms</a>
+  <a href="#nav">04 Partial navigation</a>
+  <a href="#components">05 Components</a>
+  <a href="#a11y">06 Accessibility</a>
+  <a href="#compat">07 Compatibility</a>
+</nav>
+
+<div>
+
+<section class="doc" id="what">
+  <div class="num">§01</div>
+  <h2>What HTML6 is</h2>
+  <p>HTML5 gave the web semantic structure. HTML6 is a proposal for the next layer up: <span class="dim">declarative application behaviour</span> — state, interaction, form lifecycle, and navigation — expressed directly in markup rather than assembled in JavaScript.</p>
+  <p class="dim">It ships today as a small runtime that reads plain HTML attributes and elements and wires up the behaviour they describe. Nothing about it requires a new parser or a new browser: unknown elements already degrade gracefully, and the runtime does the rest.</p>
+  <div class="def"><b>&lt;html data-html-version="6"&gt;</b> — the only marker a document needs. Browsers without the runtime still parse the page as ordinary HTML5.</div>
+</section>
+
+<section class="doc" id="state">
+  <div class="num">§02</div>
+  <h2>Declarative state &amp; actions</h2>
+  <p>State lives in a <code>&lt;state&gt;</code> element instead of a JavaScript variable. Elements read it with <code>when</code>, and buttons mutate it with <code>action</code> — no event listeners written by hand.</p>
+
+  <pre class="code">&lt;<span class="tag">state</span> <span class="attr">name</span>=<span class="str">"menu"</span> <span class="attr">value</span>=<span class="str">"closed"</span>&gt;&lt;/<span class="tag">state</span>&gt;
+
+&lt;<span class="tag">button</span> <span class="attr">action</span>=<span class="str">"toggle"</span> <span class="attr">target</span>=<span class="str">"menu"</span>&gt;Toggle menu&lt;/<span class="tag">button</span>&gt;
+
+&lt;<span class="tag">div</span> <span class="attr">when</span>=<span class="str">"menu == open"</span>&gt;
+  The menu is open.
+&lt;/<span class="tag">div</span>&gt;</pre>
+
+  <div class="demo">
+    <span class="demo-label">LIVE — toggle</span>
+    <div class="demo-body">
+      <state name="menu" value="closed"></state>
+      <button action="toggle" target="menu">Toggle menu</button>
+      <div when="menu == open">The menu is open.</div>
+    </div>
+  </div>
+
+  <p class="dim">The same primitive extends to numeric state, so counters need no script at all:</p>
+
+  <div class="demo">
+    <span class="demo-label">LIVE — increment / decrement</span>
+    <div class="demo-body">
+      <state name="counter" value="0"></state>
+      <span class="counter-val"><output show="counter">0</output></span>
+      <button action="decrement" target="counter">−1</button>
+      <button action="increment" target="counter">+1</button>
+      <button action="set" target="counter" value="0">Reset</button>
+    </div>
+  </div>
+
+  <table class="ref">
+    <tr><th>Action</th><th>Effect</th></tr>
+    <tr><td class="mono">set</td><td>Assigns <code>value</code> to the target state</td></tr>
+    <tr><td class="mono">toggle</td><td>Flips a state between two declared values</td></tr>
+    <tr><td class="mono">increment / decrement</td><td>Adjusts a numeric state by 1</td></tr>
+    <tr><td class="mono">show / hide</td><td>Forces a state to a visible / hidden value</td></tr>
+  </table>
+</section>
+
+<section class="doc" id="forms">
+  <div class="num">§03</div>
+  <h2>Forms with built-in pending states</h2>
+  <p>Submission feedback — the disabled button, the "Submitting…" label, the error summary — is one of the most re-implemented patterns in every framework. HTML6 proposes expressing it declaratively.</p>
+
+  <pre class="code">&lt;<span class="tag">form</span>&gt;
+  &lt;<span class="tag">input</span> <span class="attr">name</span>=<span class="str">"email"</span> <span class="attr">type</span>=<span class="str">"email"</span> <span class="attr">required</span>&gt;
+
+  &lt;<span class="tag">button</span> <span class="attr">type</span>=<span class="str">"submit"</span> <span class="attr">pending-text</span>=<span class="str">"Submitting..."</span>&gt;
+    Submit
+  &lt;/<span class="tag">button</span>&gt;
+&lt;/<span class="tag">form</span>&gt;</pre>
+
+  <div class="demo">
+    <span class="demo-label">LIVE — submit</span>
+    <div class="demo-body">
+      <form data-h6-form>
+        <input type="email" name="email" placeholder="you@example.com" required>
+        <div class="err">Enter a valid email address.</div>
+        <button type="submit" pending-text="Submitting…">Submit</button>
+      </form>
+    </div>
+  </div>
+  <p class="dim">This demo simulates a 900ms round trip: the button disables, its label swaps to <code>pending-text</code>, and a bare-required field surfaces an accessible error rather than the browser's default tooltip.</p>
+</section>
+
+<section class="doc" id="nav">
+  <div class="num">§04</div>
+  <h2>Partial navigation</h2>
+  <p>A link can ask the runtime to fetch its destination and swap only one region of the current page, pushing history as it goes. If the fetch fails, or the runtime is absent, the link behaves as an ordinary navigation.</p>
+
+  <pre class="code">&lt;<span class="tag">a</span>
+  <span class="attr">href</span>=<span class="str">"/inbox"</span>
+  <span class="attr">update</span>=<span class="str">"#content"</span>
+  <span class="attr">history</span>=<span class="str">"push"</span>&gt;
+  Inbox
+&lt;/<span class="tag">a</span>&gt;</pre>
+
+  <div class="def"><b>Why markup, not JavaScript:</b> the fallback is free. Remove the runtime and the link still works — it just reloads the page instead of patching it.</div>
+</section>
+
+<section class="doc" id="components">
+  <div class="num">§05</div>
+  <h2>Declarative components</h2>
+  <p>Rather than inventing a competing component model, HTML6 leans on Shadow DOM that browsers already ship. A <code>&lt;component&gt;</code> wrapper just gives the declaration a name.</p>
+
+  <pre class="code">&lt;<span class="tag">component</span> <span class="attr">name</span>=<span class="str">"user-card"</span>&gt;
+  &lt;<span class="tag">template</span> <span class="attr">shadowrootmode</span>=<span class="str">"open"</span>&gt;
+    &lt;<span class="tag">article</span>&gt;
+      &lt;<span class="tag">slot</span>&gt;&lt;/<span class="tag">slot</span>&gt;
+    &lt;/<span class="tag">article</span>&gt;
+  &lt;/<span class="tag">template</span>&gt;
+&lt;/<span class="tag">component</span>&gt;
+
+&lt;<span class="tag">user-card</span>&gt;Colm Lenehan — Maintainer&lt;/<span class="tag">user-card</span>&gt;</pre>
+
+  <div class="demo">
+    <span class="demo-label">RENDERED</span>
+    <div class="demo-body">
+      <article class="user-card">Colm Lenehan — Maintainer</article>
+    </div>
+  </div>
+</section>
+
+<section class="doc" id="a11y">
+  <div class="num">§06</div>
+  <h2>Accessibility is load-bearing, not optional</h2>
+  <p class="dim">Every state change above the fold in this document announces through the same primitives assistive technology already understands: live regions for <code>when</code> transitions, disabled/aria-busy pairing for pending submits, and focus retention across partial navigation. None of it is automatic in every case — authors are still responsible for a coherent interface — but the defaults lean toward correctness.</p>
+</section>
+
+<section class="doc" id="compat">
+  <div class="num">§07</div>
+  <h2>Browser compatibility</h2>
+  <p class="dim">HTML6 is a compatibility layer, not a replacement parser. Any browser shipping today already parses unrecognised elements without error, so the runtime — two files, <code>html6.js</code> and <code>html6.css</code> — attaches the described behaviour on top of the DOM you already have. The repository's <code>minibrowser/</code> directory documents one integration path, loading the runtime into a <code>WKWebView</code> as a document-end user script.</p>
+</section>
+
+</div>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>HTML6 — an independent experimental proposal. Not affiliated with W3C, WHATWG, or any browser vendor.</div>
+    <div><a href="https://github.com/colmlenehan-gh/HTML6">colmlenehan-gh/HTML6</a> · MIT License · © 2026 Colm Lenehan</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Minimal illustrative HTML6-style runtime for this page's live demos only.
+  function getState(name){
+    var el = document.querySelector('state[name="'+name+'"]');
+    return el ? el.getAttribute('value') : null;
+  }
+  function setState(name, val){
+    var el = document.querySelector('state[name="'+name+'"]');
+    if(!el) return;
+    el.setAttribute('value', val);
+    document.querySelectorAll('[when]').forEach(function(w){
+      var m = w.getAttribute('when').match(/(\w+)\s*==\s*(\w+)/);
+      if(m && m[1] === name){
+        w.classList.toggle('h6-active', String(val) === m[2]);
+      }
+    });
+    document.querySelectorAll('output[show="'+name+'"]').forEach(function(o){ o.textContent = val; });
+  }
+  document.querySelectorAll('button[action]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var action = btn.getAttribute('action');
+      var target = btn.getAttribute('target');
+      var cur = getState(target);
+      if(action === 'toggle'){
+        setState(target, cur === 'closed' ? 'open' : 'closed');
+      } else if(action === 'increment'){
+        setState(target, (parseInt(cur,10)||0) + 1);
+      } else if(action === 'decrement'){
+        setState(target, (parseInt(cur,10)||0) - 1);
+      } else if(action === 'set'){
+        setState(target, btn.getAttribute('value'));
+      }
+    });
+  });
+  // init when-blocks
+  document.querySelectorAll('[when]').forEach(function(w){
+    var m = w.getAttribute('when').match(/(\w+)\s*==\s*(\w+)/);
+    if(m){ w.classList.toggle('h6-active', getState(m[1]) === m[2]); }
+  });
+
+  // form demo
+  var form = document.querySelector('form[data-h6-form]');
+  if(form){
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var input = form.querySelector('input');
+      var err = form.querySelector('.err');
+      var btn = form.querySelector('button[type="submit"]');
+      if(!input.checkValidity()){
+        err.classList.add('h6-show');
+        return;
+      }
+      err.classList.remove('h6-show');
+      var original = btn.textContent;
+      btn.disabled = true;
+      btn.setAttribute('aria-busy','true');
+      btn.textContent = btn.getAttribute('pending-text') || 'Submitting…';
+      setTimeout(function(){
+        btn.disabled = false;
+        btn.removeAttribute('aria-busy');
+        btn.textContent = 'Submitted ✓';
+        setTimeout(function(){ btn.textContent = original; }, 1600);
+      }, 900);
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
