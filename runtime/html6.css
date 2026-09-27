@@ -1,0 +1,29 @@
+/* Conservative defaults. Authors can override these normally. */
+application,
+navigation,
+notice,
+timeline,
+item,
+field-group,
+output-region {
+  box-sizing: border-box;
+}
+
+notice[role="alert"] {
+  display: block;
+  margin-block: 0.75rem;
+}
+
+notice[role="status"] {
+  display: block;
+  margin-block: 0.5rem;
+}
+
+field-group {
+  display: block;
+}
+
+state,
+component[name] {
+  display: none !important;
+}
