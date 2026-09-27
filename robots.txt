@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://colmlenehan-gh.github.io/HTML6/sitemap.xml
