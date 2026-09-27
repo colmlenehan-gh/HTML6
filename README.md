@@ -286,7 +286,7 @@ HTML6/
 
 ## Design Principles
 
-HTML6 is being developed around several principles:
+HTML6 is being developed around some several principles:
 
 ### Declarative First
 
