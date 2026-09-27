@@ -1,0 +1,7 @@
+{
+  "name": "html6-reference-implementation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Experimental HTML6 compatibility layer and MiniBrowser integration",
+  "license": "MIT"
+}
